@@ -1,44 +1,119 @@
+use std::env;
+use std::fs::File;
+use std::io::Write;
+
 const ELEMENTARY_CHARGE: f64 = 1.602176565e-19;
 const PERMITTIVITY: f64 = 8.85418782e-12;
 const ELECTRON_MASS: f64 = 9.10938215e-31;
 
-const MAX_ITERATIONS: usize = 1000;
+const MAX_ITERATIONS: usize = 4000;
 const CONVERGENCE_CHECK_RATE: usize = 50;
 const CONVERGENCE_TOLERANCE: f64 = 1e-6;
+const SIMULATION_TIMESTEP: f64 = 1e-10;
+const NUM_SIMULATION_TIMESTEPS: usize = 5000;
 
-pub fn simulate(num_mesh_nodes: usize) {
+pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
     let mut potential = vec![0.0_f64; num_mesh_nodes];
-    let mut charge_density = vec![ELEMENTARY_CHARGE; num_mesh_nodes];
+    let mut charge_density = vec![ELEMENTARY_CHARGE * 1e12; num_mesh_nodes];
     let mut electric_field = vec![0.0_f64; num_mesh_nodes];
 
     let mesh_origin: f64 = 0.0;
     let mesh_end: f64 = 0.1;
 
-    let node_spacing = (mesh_end - mesh_origin) / (num_mesh_nodes - 1) as f64;
+    let dx = (mesh_end - mesh_origin) / (num_mesh_nodes - 1) as f64;
 
-    solve_potential(
-        &mut potential,
-        &mut charge_density,
-        &mut electric_field,
-        node_spacing,
-    );
+    // Computing potential on mesh based on charge density.
+    solve_potential(&mut potential, &mut charge_density, dx);
 
-    compute_electric_field(&mut potential, &mut electric_field, node_spacing, true);
+    // Computing electric field on mesh based on the potential.
+    compute_electric_field(&mut potential, &mut electric_field, dx, true);
 
-    output_simulation_state(
-        &mut potential,
-        &mut charge_density,
-        &mut electric_field,
-        node_spacing,
-    );
+    // Defining the single particle as an electron.
+    let mass = ELECTRON_MASS;
+    let charge = -ELEMENTARY_CHARGE;
+    let mut position = 4.0 * dx;
+    let mut velocity = 0.0;
+    let dt = SIMULATION_TIMESTEP;
+
+    // Rewinding velocity by half a timestep so that explicit averaging
+    // of velocities is not required when using the Leapfrog method.
+    let logical_coordinate = position_to_logical_coordinate(position, dx, mesh_origin);
+    let interpolated_electric_field = gather(logical_coordinate, &mut electric_field);
+    velocity -= 0.5 * (charge / mass) * interpolated_electric_field * dt;
+
+    // Retrieving the maximum potential for use in the potential energy calculation.
+    let mut maximum_potential = potential[0];
+    for i in 1..num_mesh_nodes {
+        if potential[i] > maximum_potential {
+            maximum_potential = potential[i];
+        }
+    }
+
+    // Opening a file for writing trace information.
+    let current_directory = env::current_dir()?;
+    let trace_filepath = current_directory.join("trace.csv");
+    let mut trace_file = File::create(trace_filepath).unwrap();
+
+    // Writing CSV columns.
+    writeln!(
+        &mut trace_file,
+        "time,position,velocity,kinetic_energy,potential_energy"
+    )
+    .unwrap();
+
+    // Simulating motion of a single particle through an electric field.
+    for ts in 1..=NUM_SIMULATION_TIMESTEPS {
+        // Sampling mesh data at particle position.
+        let logical_coordinate = position_to_logical_coordinate(position, dx, mesh_origin);
+        let interpolated_electric_field = gather(logical_coordinate, &mut electric_field);
+
+        // Integrating velocity and position.
+        let previous_position = position;
+        velocity += (charge / mass) * interpolated_electric_field * dt;
+        position += velocity * dt;
+
+        // Interpolating the potential at the average position.
+        let average_position = 0.5 * (position + previous_position);
+        let logical_average_position =
+            position_to_logical_coordinate(average_position, dx, mesh_origin);
+        let interpolated_average_potential = gather(logical_average_position, &mut potential);
+
+        // Kinetic and potential energy are given in electron volts.
+        let kinetic_energy = 0.5 * mass * velocity * velocity / ELEMENTARY_CHARGE;
+        let potential_energy =
+            charge * (interpolated_average_potential - maximum_potential) / ELEMENTARY_CHARGE;
+
+        // Writing particle trace information to file.
+        writeln!(
+            &mut trace_file,
+            "{},{},{},{},{}",
+            ts as f64 * dt,
+            position,
+            velocity,
+            kinetic_energy,
+            potential_energy
+        )
+        .unwrap();
+
+        // Printing particle information every 1000 timesteps.
+        if ts == 1 || ts % 1000 == 0 {
+            println!(
+                "ts: {}, x: {}, v: {}, phi: {}, ke: {}, pe: {}, ef: {}",
+                ts,
+                position,
+                velocity,
+                interpolated_average_potential,
+                kinetic_energy,
+                potential_energy,
+                interpolated_electric_field,
+            );
+        }
+    }
+
+    Ok(())
 }
 
-fn solve_potential(
-    potential: &mut Vec<f64>,
-    charge_density: &mut Vec<f64>,
-    electric_field: &mut Vec<f64>,
-    dx: f64,
-) {
+fn solve_potential(potential: &mut Vec<f64>, charge_density: &mut Vec<f64>, dx: f64) {
     let dx2 = dx * dx;
     let relaxation_parameter: f64 = 1.4;
     let num_mesh_nodes = potential.len();
@@ -67,7 +142,7 @@ fn solve_potential(
                 residue_sum += residue_component * residue_component;
             }
 
-            let residue_l2_norm = (residue_sum / num_mesh_nodes as f64).sqrt();
+            let residue_l2_norm = (residue_sum).sqrt() / num_mesh_nodes as f64;
 
             // Convergence implies we've found a solution, so we return.
             if residue_l2_norm < CONVERGENCE_TOLERANCE {
@@ -91,31 +166,43 @@ fn compute_electric_field(
     potential: &mut Vec<f64>,
     electric_field: &mut Vec<f64>,
     dx: f64,
-    first_order_boundary_approx: bool,
+    second_order_boundary_approx: bool,
 ) {
     let num_mesh_nodes = potential.len();
 
     // Applying the central finite difference method to internal nodes.
     for i in 1..num_mesh_nodes - 1 {
-        electric_field[i] = -(potential[i + 1] - potential[i - 1]) / 2.0 * dx;
+        electric_field[i] = -(potential[i + 1] - potential[i - 1]) / (2.0 * dx);
     }
 
     // Applying a one sided first or second order difference on boundaries.
-    if first_order_boundary_approx {
-        electric_field[0] = (potential[0] - potential[1]) / dx;
-        electric_field[num_mesh_nodes - 1] =
-            (potential[num_mesh_nodes - 2] - potential[num_mesh_nodes - 1]) / dx;
-    } else {
-        electric_field[0] = (3.0 * potential[0] - 4.0 * potential[1] + potential[2]) / 2.0 * dx;
+    if second_order_boundary_approx {
+        electric_field[0] = (3.0 * potential[0] - 4.0 * potential[1] + potential[2]) / (2.0 * dx);
         electric_field[num_mesh_nodes - 1] = (-potential[num_mesh_nodes - 3]
             + 4.0 * potential[num_mesh_nodes - 2]
             - 3.0 * potential[num_mesh_nodes - 1])
-            / 2.0
-            * dx;
+            / (2.0 * dx);
+    } else {
+        electric_field[0] = (potential[0] - potential[1]) / dx;
+        electric_field[num_mesh_nodes - 1] =
+            (potential[num_mesh_nodes - 2] - potential[num_mesh_nodes - 1]) / dx;
     }
 }
 
-fn output_simulation_state(
+fn position_to_logical_coordinate(position: f64, dx: f64, mesh_origin: f64) -> f64 {
+    return (position - mesh_origin) / dx;
+}
+
+fn gather(logical_coordinate: f64, field: &mut Vec<f64>) -> f64 {
+    let left_node_index = logical_coordinate.trunc() as usize;
+    let right_node_index = left_node_index + 1;
+    let fractional_distance = logical_coordinate.fract();
+
+    return field[left_node_index] * (1.0 - fractional_distance)
+        + field[right_node_index] * fractional_distance;
+}
+
+fn _output_simulation_state(
     potential: &mut Vec<f64>,
     charge_density: &mut Vec<f64>,
     electric_field: &mut Vec<f64>,
