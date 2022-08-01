@@ -1,8 +1,6 @@
-use std::ops;
-
 use crate::field::Field;
 use crate::mesh::{BoxMesh, Dimensions};
-use crate::point::Point;
+use crate::vector::Vec3;
 
 pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
     // Note that the mesh dimensions must be high enough, relative to the distance
@@ -12,12 +10,12 @@ pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
     let mesh_dimensions = Dimensions::new(21, 21, 21);
 
     let grounded_box_mesh = BoxMesh::new(
-        Point::new(-0.1, -0.1, -0.1),
-        Point::new(0.1, 0.1, 0.2),
+        Vec3::new(-0.1, -0.1, -0.1),
+        Vec3::new(0.1, 0.1, 0.2),
         mesh_dimensions,
     );
 
-    let field = Field::<f64>::new(mesh_dimensions);
+    let field = Field::<Vec3>::new(mesh_dimensions);
 
     Ok(())
 }

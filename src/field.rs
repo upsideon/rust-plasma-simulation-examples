@@ -1,7 +1,7 @@
-use std::ops;
+use std::ops::{Add, Div, Index, Mul, Sub};
 
 use ndarray::prelude::*;
-use ndarray::{Array3, Dim};
+use ndarray::{Array3, ScalarOperand};
 use num_traits::identities::Zero;
 
 use crate::mesh::Dimensions;
@@ -11,11 +11,51 @@ pub struct Field<T: Clone + Zero> {
     data: Array3<T>,
 }
 
-impl<T: Clone + Zero> ops::Index<[usize; 3]> for Field<T> {
+impl<T: Clone + Zero> Index<[usize; 3]> for Field<T> {
     type Output = T;
 
     fn index(&self, indices: [usize; 3]) -> &Self::Output {
         &self.data[indices]
+    }
+}
+
+impl<T: Clone + Zero + Add<U, Output = T>, U: ScalarOperand> Add<U> for Field<T> {
+    type Output = Self;
+
+    fn add(self, addend: U) -> Self {
+        let data = self.data + addend;
+
+        Self { data: data }
+    }
+}
+
+impl<T: Clone + Zero + Sub<U, Output = T>, U: ScalarOperand> Sub<U> for Field<T> {
+    type Output = Self;
+
+    fn sub(self, subtrahend: U) -> Self {
+        let data = self.data - subtrahend;
+
+        Self { data: data }
+    }
+}
+
+impl<T: Clone + Zero + Mul<U, Output = T>, U: ScalarOperand> Mul<U> for Field<T> {
+    type Output = Self;
+
+    fn mul(self, multiplier: U) -> Self {
+        let data = self.data * multiplier;
+
+        Self { data: data }
+    }
+}
+
+impl<T: Clone + Zero + Div<U, Output = T>, U: ScalarOperand> Div<U> for Field<T> {
+    type Output = Self;
+
+    fn div(self, divisor: U) -> Self {
+        let data = self.data / divisor;
+
+        Self { data: data }
     }
 }
 

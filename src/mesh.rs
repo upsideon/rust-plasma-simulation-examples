@@ -1,4 +1,4 @@
-use crate::point::Point;
+use crate::vector::Vec3;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Dimensions {
@@ -22,19 +22,19 @@ impl From<Dimensions> for (usize, usize, usize) {
 #[derive(Debug)]
 pub struct BoxMesh {
     /// Specifies coordinates of the origin in 3-dimensional space.
-    origin: Point,
+    origin: Vec3,
     /// Specifies the corner diagonally opposite of the origin.
-    max_bound: Point,
+    max_bound: Vec3,
     /// Specifies the number of nodes along the x, y and z axes.
     dimensions: Dimensions,
     /// Specifies the cell spacings for the x, y, and z axes.
     cell_spacings: [f64; 3],
     /// Specifies the centroid of the mesh.
-    centroid: Point,
+    centroid: Vec3,
 }
 
 impl BoxMesh {
-    pub fn new(origin: Point, max_bound: Point, dimensions: Dimensions) -> Self {
+    pub fn new(origin: Vec3, max_bound: Vec3, dimensions: Dimensions) -> Self {
         let centroid = (origin + max_bound) * 0.5;
 
         let cell_spacings = [

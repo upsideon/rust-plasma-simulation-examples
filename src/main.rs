@@ -1,7 +1,8 @@
 mod field;
-mod grounded_box;
 mod mesh;
-mod point;
+mod vector;
+
+mod grounded_box;
 mod single_particle;
 
 fn main() -> std::io::Result<()> {
