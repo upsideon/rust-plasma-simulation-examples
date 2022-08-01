@@ -63,6 +63,7 @@ name = "plasma-simulation"
 version = "0.1.0"
 dependencies = [
  "ndarray",
+ "num-traits",
 ]
 
 [[package]]
