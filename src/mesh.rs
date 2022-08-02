@@ -1,3 +1,4 @@
+use crate::field::Field;
 use crate::vector::Vec3;
 
 #[derive(Clone, Copy, Debug)]
@@ -31,6 +32,12 @@ pub struct BoxMesh {
     cell_spacings: [f64; 3],
     /// Specifies the centroid of the mesh.
     centroid: Vec3,
+    /// Specifies the potential on the mesh.
+    potential: Field::<f64>,
+    /// Specifies the charge density on the mesh.
+    charge_density: Field::<f64>,
+    /// Specifies the electric field on the mesh.
+    electric_field: Field::<Vec3>,
 }
 
 impl BoxMesh {
@@ -49,6 +56,9 @@ impl BoxMesh {
             dimensions: dimensions,
             cell_spacings: cell_spacings,
             centroid: centroid,
+            potential: Field::<f64>::new(dimensions),
+            charge_density: Field::<f64>::new(dimensions),
+            electric_field: Field::<Vec3>::new(dimensions),
         }
     }
 }

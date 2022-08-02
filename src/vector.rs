@@ -15,7 +15,7 @@ impl Vec3 {
     }
 }
 
-impl num_traits::identities::Zero for Vec3 {
+impl Zero for Vec3 {
     fn zero() -> Self {
         Vec3 {
             x: 0.0,
