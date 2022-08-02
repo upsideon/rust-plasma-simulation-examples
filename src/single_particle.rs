@@ -2,9 +2,7 @@ use std::env;
 use std::fs::File;
 use std::io::Write;
 
-const ELEMENTARY_CHARGE: f64 = 1.602176565e-19;
-const PERMITTIVITY: f64 = 8.85418782e-12;
-const ELECTRON_MASS: f64 = 9.10938215e-31;
+use crate::constants::{ELECTRON_MASS, ELEMENTARY_CHARGE, PERMITTIVITY};
 
 const MAX_ITERATIONS: usize = 4000;
 const CONVERGENCE_CHECK_RATE: usize = 50;

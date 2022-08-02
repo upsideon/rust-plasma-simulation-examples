@@ -1,4 +1,4 @@
-use std::ops::{Add, Div, Index, Mul, Sub};
+use std::ops::{Add, Div, Index, IndexMut, Mul, Sub};
 
 use ndarray::prelude::*;
 use ndarray::{Array3, ScalarOperand};
@@ -16,6 +16,12 @@ impl<T: Clone + Zero> Index<[usize; 3]> for Field<T> {
 
     fn index(&self, indices: [usize; 3]) -> &Self::Output {
         &self.data[indices]
+    }
+}
+
+impl<T: Clone + Zero> IndexMut<[usize; 3]> for Field<T> {
+    fn index_mut(&mut self, indices: [usize; 3]) -> &mut Self::Output {
+        &mut self.data[indices]
     }
 }
 

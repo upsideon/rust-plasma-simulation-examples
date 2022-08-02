@@ -1,3 +1,4 @@
+use crate::constants::PERMITTIVITY;
 use crate::field::Field;
 use crate::vector::Vec3;
 
@@ -33,11 +34,11 @@ pub struct BoxMesh {
     /// Specifies the centroid of the mesh.
     centroid: Vec3,
     /// Specifies the potential on the mesh.
-    potential: Field::<f64>,
+    potential: Field<f64>,
     /// Specifies the charge density on the mesh.
-    charge_density: Field::<f64>,
+    charge_density: Field<f64>,
     /// Specifies the electric field on the mesh.
-    electric_field: Field::<Vec3>,
+    electric_field: Field<Vec3>,
 }
 
 impl BoxMesh {
@@ -60,5 +61,73 @@ impl BoxMesh {
             charge_density: Field::<f64>::new(dimensions),
             electric_field: Field::<Vec3>::new(dimensions),
         }
+    }
+
+    pub fn solve_potential(&mut self, max_solver_iterations: usize, tolerance: f64) -> bool {
+        let dx2 = 1.0 / (self.cell_spacings[0] * self.cell_spacings[0]);
+        let dy2 = 1.0 / (self.cell_spacings[1] * self.cell_spacings[1]);
+        let dz2 = 1.0 / (self.cell_spacings[2] * self.cell_spacings[2]);
+
+        let dimensions = &self.dimensions;
+        let phi = &mut self.potential;
+        let rho = &self.charge_density;
+
+        let mut residue_l2_norm = 0.0;
+        let mut converged = false;
+
+        // Iterating through mesh to solve potential.
+        for iteration in 0..max_solver_iterations {
+            for i in 1..dimensions.x - 1 {
+                for j in 1..dimensions.y - 1 {
+                    for k in 1..dimensions.z - 1 {
+                        // Applying the Gauss-Seidel method.
+                        let new_phi = ((rho[[i, j, k]] / PERMITTIVITY)
+                            + dx2 * (phi[[i - 1, j, k]] + phi[[i + 1, j, k]])
+                            + dy2 * (phi[[i, j - 1, k]] + phi[[i, j + 1, k]])
+                            + dz2 * (phi[[i, j, k - 1]] + phi[[i, j, k + 1]]))
+                            / (2.0 * dx2 + 2.0 * dy2 + 2.0 * dz2);
+
+                        let current_phi = phi[[i, j, k]];
+
+                        // Successive over-relaxation.
+                        phi[[i, j, k]] = current_phi + 1.4 * (new_phi - current_phi);
+                    }
+                }
+            }
+
+            // Checking for convergence.
+            if iteration != 0 && iteration % 25 == 0 {
+                let mut sum = 0.0;
+
+                for i in 1..dimensions.x - 1 {
+                    for j in 1..dimensions.y - 1 {
+                        for k in 1..dimensions.z - 1 {
+                            let r = -phi[[i, j, k]] * (2.0 * dx2 + 2.0 * dy2 + 2.0 * dz2)
+                                + (rho[[i, j, k]] / PERMITTIVITY)
+                                + dx2 * (phi[[i - 1, j, k]] + phi[[i + 1, j, k]])
+                                + dy2 * (phi[[i, j - 1, k]] + phi[[i, j + 1, k]])
+                                + dz2 * (phi[[i, j, k - 1]] + phi[[i, j, k + 1]]);
+                            sum += r * r;
+                        }
+                    }
+                }
+
+                residue_l2_norm =
+                    (sum / (dimensions.x * dimensions.y * dimensions.z) as f64).sqrt();
+                if residue_l2_norm < tolerance {
+                    converged = true;
+                    break;
+                }
+            }
+        }
+
+        if !converged {
+            println!(
+                "Gauss-Seidel solver failed to converge after {} iterations.",
+                max_solver_iterations,
+            );
+        }
+
+        converged
     }
 }
