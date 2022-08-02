@@ -136,4 +136,60 @@ impl BoxMesh {
 
         converged
     }
+
+    pub fn compute_electric_field(&mut self) {
+        let dx = self.cell_spacings[0];
+        let dy = self.cell_spacings[1];
+        let dz = self.cell_spacings[2];
+
+        let dimensions = &self.dimensions;
+        let phi = &mut self.potential;
+
+        for i in 0..dimensions.x {
+            for j in 0..dimensions.y {
+                for k in 0..dimensions.z {
+                    let ef = &mut self.electric_field[[i, j, k]];
+
+                    // Computing the x-component.
+                    if i == 0 {
+                        ef.x = -(-3.0 * phi[[i, j, k]] + 4.0 * phi[[i + 1, j, k]]
+                            - phi[[i + 2, j, k]])
+                            / (2.0 * dx);
+                    } else if i == dimensions.x - 1 {
+                        ef.x = -(phi[[i - 2, j, k]] - 4.0 * phi[[i - 1, j, k]]
+                            + 3.0 * phi[[i, j, k]])
+                            / (2.0 * dx);
+                    } else {
+                        ef.x = -(phi[[i + 1, j, k]] - phi[[i - 1, j, k]]) / (2.0 * dx);
+                    }
+
+                    // Computing the y-component.
+                    if j == 0 {
+                        ef.y = -(-3.0 * phi[[i, j, k]] + 4.0 * phi[[i, j + 1, k]]
+                            - phi[[i, j + 2, k]])
+                            / (2.0 * dy);
+                    } else if j == dimensions.y - 1 {
+                        ef.y = -(phi[[i, j - 2, k]] - 4.0 * phi[[i, j - 1, k]]
+                            + 3.0 * phi[[i, j, k]])
+                            / (2.0 * dy);
+                    } else {
+                        ef.y = -(phi[[i, j + 1, k]] - phi[[i, j - 1, k]]) / (2.0 * dy);
+                    }
+
+                    // Computing the z-component.
+                    if k == 0 {
+                        ef.z = -(-3.0 * phi[[i, j, k]] + 4.0 * phi[[i, j, k + 1]]
+                            - phi[[i, j, k + 2]])
+                            / (2.0 * dz);
+                    } else if k == dimensions.z - 1 {
+                        ef.z = -(phi[[i, j, k - 2]] - 4.0 * phi[[i, j, k - 1]]
+                            + 3.0 * phi[[i, j, k]])
+                            / (2.0 * dz);
+                    } else {
+                        ef.z = -(phi[[i, j, k + 1]] - phi[[i, j, k - 1]]) / (2.0 * dz);
+                    }
+                }
+            }
+        }
+    }
 }

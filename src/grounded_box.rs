@@ -18,6 +18,7 @@ pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
     );
 
     grounded_box_mesh.solve_potential(MAX_ITERATIONS, CONVERGENCE_TOLERANCE);
+    grounded_box_mesh.compute_electric_field();
 
     Ok(())
 }
