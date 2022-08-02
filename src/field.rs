@@ -1,6 +1,5 @@
 use std::ops::{Add, Div, Index, IndexMut, Mul, Sub};
 
-use ndarray::prelude::*;
 use ndarray::{Array3, ScalarOperand};
 use num_traits::identities::Zero;
 

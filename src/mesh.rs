@@ -116,6 +116,13 @@ impl BoxMesh {
                     (sum / (dimensions.x * dimensions.y * dimensions.z) as f64).sqrt();
                 if residue_l2_norm < tolerance {
                     converged = true;
+
+                    println!(
+                        "Gauss-Seidel solver converged after {} iterations with an L2 norm of {}.",
+                        iteration,
+                        residue_l2_norm
+                    );
+
                     break;
                 }
             }
