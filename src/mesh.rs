@@ -119,8 +119,7 @@ impl BoxMesh {
 
                     println!(
                         "Gauss-Seidel solver converged after {} iterations with an L2 norm of {}.",
-                        iteration,
-                        residue_l2_norm
+                        iteration, residue_l2_norm
                     );
 
                     break;
