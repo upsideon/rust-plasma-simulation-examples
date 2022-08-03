@@ -8,7 +8,7 @@ The author of the book provides simulation code written in C++, but here the sim
 
 *Plasma Simulations by Example* by Lubos Brieda can be found [here](https://www.amazon.com/gp/product/1138342327). As a disclaimer, I am not associated with the author and I have not been paid to promote this book. I find the text to be a useful resource for understanding the basics of computational plasma physics. The author is duly credited, as this repository represents a fair use derivative work of the author's original C++ simulation code.
 
-![Cover of Plasma Simulations by Example](https://images-na.ssl-images-amazon.com/images/I/41nnAd342UL._SX330_BO1,204,203,200_.jpg)
+![Cover of Plasma Simulations by Example](https://images-na.ssl-images-amazon.com/images/I/41sqjn4babL._SY291_BO1,204,203,200_QL40_ML2_.jpg)
 
 ### Execution
 
