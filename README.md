@@ -1,4 +1,4 @@
-## rust-plasma-simulation-examples
+## Rust Plasma Simulation Examples
 
 This repository contains a set of basic plasma physics simulations implemented based on Lubos Brieda's *Plasma Simulations by Example*.
 
