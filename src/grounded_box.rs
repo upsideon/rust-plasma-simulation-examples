@@ -27,8 +27,14 @@ pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
             String::from("O+"),
             16.0 * ATOMIC_MASS_UNIT,
             ELEMENTARY_CHARGE,
+            &grounded_box_mesh,
         ),
-        Species::new(String::from("e-"), ELECTRON_MASS, -ELEMENTARY_CHARGE),
+        Species::new(
+            String::from("e-"),
+            ELECTRON_MASS,
+            -ELEMENTARY_CHARGE,
+            &grounded_box_mesh,
+        ),
     ];
 
     const NUMBER_DENSITY: f64 = 1e11;

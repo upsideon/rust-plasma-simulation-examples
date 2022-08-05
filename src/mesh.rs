@@ -82,6 +82,14 @@ impl BoxMesh {
         self.centroid
     }
 
+    pub fn dimensions(&self) -> Dimensions {
+        self.dimensions
+    }
+
+    pub fn node_volumes(&self) -> Field<f64> {
+        self.node_volumes.clone()
+    }
+
     pub fn position_to_logical_coordinate(&self, position: Vec3) -> Vec3 {
         let mut logical_coordinate = position - self.origin;
         logical_coordinate.x /= self.dimensions.x as f64;

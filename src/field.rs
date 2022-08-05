@@ -1,12 +1,12 @@
 use std::ops::{Add, AddAssign, Div, Index, IndexMut, Mul, Sub};
 
-use ndarray::{Array3, ScalarOperand};
+use ndarray::{Array3, ArrayBase, Dim, OwnedRepr, ScalarOperand};
 use num_traits::identities::Zero;
 
 use crate::mesh::Dimensions;
 use crate::vector::Vec3;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Field<T: Copy + Clone + Zero + Mul<f64> + AddAssign<<T as Mul<f64>>::Output>> {
     data: Array3<T>,
     shape: (usize, usize, usize),
@@ -20,6 +20,16 @@ impl<T: Copy + Clone + Zero + Mul<f64> + AddAssign<<T as Mul<f64>>::Output>> Fie
         Field {
             data: data,
             shape: shape,
+        }
+    }
+
+    pub fn clear(&mut self) {
+        for i in 0..self.shape.0 {
+            for j in 0..self.shape.1 {
+                for k in 0..self.shape.2 {
+                    self.data[[i, j, k]].set_zero();
+                }
+            }
         }
     }
 
@@ -52,6 +62,30 @@ impl<T: Copy + Clone + Zero + Mul<f64> + AddAssign<<T as Mul<f64>>::Output>> Fie
         self.data[[i + 1, j, k + 1]] += value * (di * (1.0 - dj) * dk);
         self.data[[i + 1, j + 1, k + 1]] += value * (di * dj * dk);
         self.data[[i, j + 1, k + 1]] += value * ((1.0 - di) * dj * dk);
+    }
+}
+
+impl<
+        T: Copy + Clone + Zero + Mul<f64> + Div + Div<Output = T> + AddAssign<<T as Mul<f64>>::Output>,
+    > Div for Field<T>
+{
+    type Output = Self;
+
+    fn div(self, other: Self) -> Self::Output {
+        let mut new_field = Field {
+            data: Array3::<T>::zeros(self.shape),
+            shape: self.shape,
+        };
+
+        for i in 0..self.shape.0 {
+            for j in 0..self.shape.1 {
+                for k in 0..self.shape.2 {
+                    new_field[[i, j, k]] = self[[i, j, k]] / other[[i, j, k]];
+                }
+            }
+        }
+
+        new_field
     }
 }
 

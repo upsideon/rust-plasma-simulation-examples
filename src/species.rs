@@ -3,22 +3,28 @@ use std::string::String;
 use rand;
 use rand::Rng;
 
+use crate::field::Field;
+use crate::mesh::BoxMesh;
 use crate::particle::Particle;
 use crate::vector::Vec3;
 
-pub struct Species {
+pub struct Species<'a> {
     name: String,
     mass: f64,
     charge: f64,
+    number_density: Field<f64>,
+    mesh: &'a BoxMesh,
     particles: Vec<Particle>,
 }
 
-impl Species {
-    pub fn new(name: String, mass: f64, charge: f64) -> Self {
+impl<'a> Species<'a> {
+    pub fn new(name: String, mass: f64, charge: f64, mesh: &'a BoxMesh) -> Self {
         Species {
             name: name,
             mass: mass,
             charge: charge,
+            number_density: Field::<f64>::new(mesh.dimensions()),
+            mesh: mesh,
             particles: Vec::<Particle>::new(),
         }
     }
@@ -27,6 +33,18 @@ impl Species {
     pub fn add_particle(&mut self, position: Vec3, velocity: Vec3, macroparticle_weight: f64) {
         self.particles
             .push(Particle::new(position, velocity, macroparticle_weight));
+    }
+
+    pub fn compute_number_density(&mut self) {
+        self.number_density.clear();
+
+        for particle in &self.particles {
+            let logical_coordinate = self.mesh.position_to_logical_coordinate(particle.position);
+            self.number_density
+                .scatter(logical_coordinate, particle.macroparticle_weight);
+        }
+
+        self.number_density = self.number_density.clone() / self.mesh.node_volumes();
     }
 
     /// Loads particles in a box defined by points in opposite corners of the box.

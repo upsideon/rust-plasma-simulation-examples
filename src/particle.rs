@@ -1,9 +1,9 @@
 use crate::vector::Vec3;
 
 pub struct Particle {
-    position: Vec3,
-    velocity: Vec3,
-    macroparticle_weight: f64,
+    pub position: Vec3,
+    pub velocity: Vec3,
+    pub macroparticle_weight: f64,
 }
 
 impl Particle {
