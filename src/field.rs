@@ -1,6 +1,6 @@
 use std::ops::{Add, AddAssign, Div, Index, IndexMut, Mul, Sub};
 
-use ndarray::{Array3, ArrayBase, Dim, OwnedRepr, ScalarOperand};
+use ndarray::{Array3, ScalarOperand};
 use num_traits::identities::Zero;
 
 use crate::mesh::Dimensions;

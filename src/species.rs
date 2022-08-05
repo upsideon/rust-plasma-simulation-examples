@@ -125,7 +125,7 @@ impl Species {
 
         let mut rng = rand::thread_rng();
 
-        for i in 0..num_macroparticles {
+        for _ in 0..num_macroparticles {
             let r = rng.gen::<f64>();
             let position = origin + diagonal_vector * r;
             let velocity = Vec3::new(0.0, 0.0, 0.0);

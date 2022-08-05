@@ -157,7 +157,7 @@ impl BoxMesh {
         let phi = &mut self.potential;
         let rho = &self.charge_density;
 
-        let mut residue_l2_norm = 0.0;
+        let mut residue_l2_norm;
         let mut converged = false;
 
         // Iterating through mesh to solve potential.
