@@ -33,6 +33,8 @@ pub struct BoxMesh {
     cell_spacings: [f64; 3],
     /// Specifies the centroid of the mesh.
     centroid: Vec3,
+    /// Specifies the volumes of nodes for number density calculations.
+    node_volumes: Field<f64>,
     /// Specifies the potential on the mesh.
     potential: Field<f64>,
     /// Specifies the charge density on the mesh.
@@ -51,15 +53,66 @@ impl BoxMesh {
             (max_bound.z - origin.z) / dimensions.z as f64,
         ];
 
-        BoxMesh {
+        let mut mesh = BoxMesh {
             origin: origin,
             max_bound: max_bound,
             dimensions: dimensions,
             cell_spacings: cell_spacings,
             centroid: centroid,
+            node_volumes: Field::<f64>::new(dimensions),
             potential: Field::<f64>::new(dimensions),
             charge_density: Field::<f64>::new(dimensions),
             electric_field: Field::<Vec3>::new(dimensions),
+        };
+
+        mesh.compute_node_volumes();
+
+        mesh
+    }
+
+    pub fn origin(&self) -> Vec3 {
+        self.origin
+    }
+
+    pub fn max_bound(&self) -> Vec3 {
+        self.max_bound
+    }
+
+    pub fn centroid(&self) -> Vec3 {
+        self.centroid
+    }
+
+    pub fn position_to_logical_coordinate(&self, position: Vec3) -> Vec3 {
+        let mut logical_coordinate = position - self.origin;
+        logical_coordinate.x /= self.dimensions.x as f64;
+        logical_coordinate.y /= self.dimensions.y as f64;
+        logical_coordinate.z /= self.dimensions.z as f64;
+        logical_coordinate
+    }
+
+    pub fn compute_node_volumes(&mut self) {
+        let cell_spacings = self.cell_spacings;
+        let dimensions = self.dimensions;
+
+        for i in 0..dimensions.x {
+            for j in 0..dimensions.y {
+                for k in 0..dimensions.z {
+                    let mut volume = cell_spacings[0] * cell_spacings[1] * cell_spacings[2];
+                    if i == 0 || i == dimensions.x - 1 {
+                        volume *= 0.5;
+                    }
+
+                    if j == 0 || j == dimensions.y - 1 {
+                        volume *= 0.5;
+                    }
+
+                    if k == 0 || k == dimensions.z - 1 {
+                        volume *= 0.5;
+                    }
+
+                    self.node_volumes[[i, j, k]] = volume;
+                }
+            }
         }
     }
 

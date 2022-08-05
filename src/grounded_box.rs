@@ -22,7 +22,7 @@ pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
     grounded_box_mesh.solve_potential(MAX_ITERATIONS, CONVERGENCE_TOLERANCE);
     grounded_box_mesh.compute_electric_field();
 
-    let species = vec![
+    let mut species = vec![
         Species::new(
             String::from("O+"),
             16.0 * ATOMIC_MASS_UNIT,
@@ -30,6 +30,23 @@ pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
         ),
         Species::new(String::from("e-"), ELECTRON_MASS, -ELEMENTARY_CHARGE),
     ];
+
+    const NUMBER_DENSITY: f64 = 1e11;
+    const NUM_IONS: usize = 80000;
+    const NUM_ELECTRONS: usize = 10000;
+
+    species[0].load_particles_box(
+        grounded_box_mesh.origin(),
+        grounded_box_mesh.max_bound(),
+        NUMBER_DENSITY,
+        NUM_IONS,
+    );
+    species[1].load_particles_box(
+        grounded_box_mesh.origin(),
+        grounded_box_mesh.centroid(),
+        NUMBER_DENSITY,
+        NUM_ELECTRONS,
+    );
 
     Ok(())
 }

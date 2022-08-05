@@ -1,5 +1,5 @@
 use std::cmp::PartialEq;
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, AddAssign, Div, Mul, Sub};
 
 use num_traits::identities::Zero;
 
@@ -50,6 +50,16 @@ impl Add<Vec3> for Vec3 {
 
     fn add(self, other: Vec3) -> Vec3 {
         Vec3 {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+        }
+    }
+}
+
+impl AddAssign for Vec3 {
+    fn add_assign(&mut self, other: Self) {
+        *self = Self {
             x: self.x + other.x,
             y: self.y + other.y,
             z: self.z + other.z,
