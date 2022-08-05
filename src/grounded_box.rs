@@ -22,18 +22,20 @@ pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
     grounded_box_mesh.solve_potential(MAX_ITERATIONS, CONVERGENCE_TOLERANCE);
     grounded_box_mesh.compute_electric_field();
 
+    let immutable_mesh = grounded_box_mesh.clone();
+
     let mut species = vec![
         Species::new(
             String::from("O+"),
             16.0 * ATOMIC_MASS_UNIT,
             ELEMENTARY_CHARGE,
-            &grounded_box_mesh,
+            &immutable_mesh,
         ),
         Species::new(
             String::from("e-"),
             ELECTRON_MASS,
             -ELEMENTARY_CHARGE,
-            &grounded_box_mesh,
+            &immutable_mesh,
         ),
     ];
 
@@ -53,6 +55,14 @@ pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
         NUMBER_DENSITY,
         NUM_ELECTRONS,
     );
+
+    // Computing number density.
+    for s in &mut species {
+        s.compute_number_density();
+    }
+
+    // Computing charge density.
+    grounded_box_mesh.compute_charge_density(species);
 
     Ok(())
 }

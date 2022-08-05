@@ -22,7 +22,7 @@ impl From<Dimensions> for (usize, usize, usize) {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct BoxMesh {
     /// Specifies coordinates of the origin in 3-dimensional space.
     origin: Vec3,
