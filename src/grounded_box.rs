@@ -17,6 +17,7 @@ pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
         Vec3::new(-0.1, -0.1, -0.1),
         Vec3::new(0.1, 0.1, 0.2),
         mesh_dimensions,
+        2e-10,
     );
 
     grounded_box_mesh.solve_potential(MAX_ITERATIONS, CONVERGENCE_TOLERANCE);

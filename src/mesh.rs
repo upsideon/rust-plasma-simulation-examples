@@ -5,9 +5,9 @@ use crate::vector::Vec3;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Dimensions {
-    x: usize,
-    y: usize,
-    z: usize,
+    pub x: usize,
+    pub y: usize,
+    pub z: usize,
 }
 
 impl Dimensions {
@@ -36,6 +36,8 @@ pub struct BoxMesh {
     centroid: Vec3,
     /// Specifies the volumes of nodes for number density calculations.
     node_volumes: Field<f64>,
+    /// Specifies the timestep for simulation.
+    timestep: f64,
     /// Specifies the potential on the mesh.
     potential: Field<f64>,
     /// Specifies the charge density on the mesh.
@@ -45,7 +47,7 @@ pub struct BoxMesh {
 }
 
 impl BoxMesh {
-    pub fn new(origin: Vec3, max_bound: Vec3, dimensions: Dimensions) -> Self {
+    pub fn new(origin: Vec3, max_bound: Vec3, dimensions: Dimensions, timestep: f64) -> Self {
         let centroid = (origin + max_bound) * 0.5;
 
         let cell_spacings = [
@@ -61,6 +63,7 @@ impl BoxMesh {
             cell_spacings: cell_spacings,
             centroid: centroid,
             node_volumes: Field::<f64>::new(dimensions),
+            timestep: timestep,
             potential: Field::<f64>::new(dimensions),
             charge_density: Field::<f64>::new(dimensions),
             electric_field: Field::<Vec3>::new(dimensions),
@@ -93,6 +96,10 @@ impl BoxMesh {
 
     pub fn electric_field(&self) -> Field<Vec3> {
         self.electric_field.clone()
+    }
+
+    pub fn timestep(&self) -> f64 {
+        self.timestep
     }
 
     pub fn position_to_logical_coordinate(&self, position: Vec3) -> Vec3 {

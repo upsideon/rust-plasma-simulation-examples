@@ -39,19 +39,55 @@ impl<'a> Species<'a> {
 
     /// Adds a particle.
     pub fn add_particle(&mut self, position: Vec3, velocity: Vec3, macroparticle_weight: f64) {
-        self.particles
-            .push(Particle::new(position, velocity, macroparticle_weight));
+        let lc = self.mesh.position_to_logical_coordinate(position);
+        let electric_field = self.mesh.electric_field().gather(lc);
+
+        let updated_velocity =
+            velocity - electric_field * (self.charge / self.mass) * (0.5 * self.mesh.timestep());
+
+        self.particles.push(Particle::new(
+            position,
+            updated_velocity,
+            macroparticle_weight,
+        ));
     }
 
-    pub fn advance(&mut self, timestep: f64) {
+    pub fn advance(&mut self) {
         let origin = self.mesh.origin();
         let max_bound = self.mesh.max_bound();
+        let dimensions = self.mesh.dimensions();
+        let dt = self.mesh.timestep();
 
         for particle in &mut self.particles {
-            let logical_coordinate = self.mesh.position_to_logical_coordinate(particle.position);
-            let electric_field = self.mesh.electric_field().gather(logical_coordinate);
-            particle.velocity += electric_field * (timestep * self.charge / self.mass);
-            particle.position += particle.velocity * timestep;
+            let lc = self.mesh.position_to_logical_coordinate(particle.position);
+            let electric_field = self.mesh.electric_field().gather(lc);
+            particle.velocity += electric_field * (dt * self.charge / self.mass);
+            particle.position += particle.velocity * dt;
+
+            // Reflecting particles leaving the mesh.
+            if lc.x < 0.0 {
+                particle.position.x = 2.0 * origin.x - particle.position.x;
+                particle.velocity.x *= -1.0;
+            } else if lc.x >= (dimensions.x - 1) as f64 {
+                particle.position.x = 2.0 * max_bound.x - particle.position.x;
+                particle.velocity.x *= -1.0;
+            }
+
+            if lc.y < 0.0 {
+                particle.position.y = 2.0 * origin.y - particle.position.y;
+                particle.velocity.y *= -1.0;
+            } else if lc.y >= (dimensions.y - 1) as f64 {
+                particle.position.y = 2.0 * max_bound.y - particle.position.y;
+                particle.velocity.y *= -1.0;
+            }
+
+            if lc.z < 0.0 {
+                particle.position.z = 2.0 * origin.z - particle.position.z;
+                particle.velocity.z *= -1.0;
+            } else if lc.z >= (dimensions.z - 1) as f64 {
+                particle.position.z = 2.0 * max_bound.z - particle.position.z;
+                particle.velocity.z *= -1.0;
+            }
         }
     }
 
