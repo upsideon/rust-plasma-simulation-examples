@@ -1,5 +1,6 @@
 use crate::constants::PERMITTIVITY;
 use crate::field::Field;
+use crate::species::Species;
 use crate::vector::Vec3;
 
 #[derive(Clone, Copy, Debug)]
@@ -96,6 +97,18 @@ impl BoxMesh {
         logical_coordinate.y /= self.dimensions.y as f64;
         logical_coordinate.z /= self.dimensions.z as f64;
         logical_coordinate
+    }
+
+    pub fn compute_charge_density(&mut self, species: Vec<Species>) {
+        self.charge_density.clear();
+
+        for s in &species {
+            if s.charge() == 0.0 {
+                continue;
+            }
+
+            self.charge_density += s.number_density() * s.charge();
+        }
     }
 
     pub fn compute_node_volumes(&mut self) {

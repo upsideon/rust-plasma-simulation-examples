@@ -65,6 +65,17 @@ impl<T: Copy + Clone + Zero + Mul<f64> + AddAssign<<T as Mul<f64>>::Output>> Fie
     }
 }
 
+impl<T: Copy + Clone + Zero + Mul<f64> + AddAssign<<T as Mul<f64>>::Output>> AddAssign
+    for Field<T>
+{
+    fn add_assign(&mut self, other: Self) {
+        *self = Self {
+            data: self.data.clone() + other.data.clone(),
+            shape: self.shape,
+        }
+    }
+}
+
 impl<
         T: Copy + Clone + Zero + Mul<f64> + Div + Div<Output = T> + AddAssign<<T as Mul<f64>>::Output>,
     > Div for Field<T>

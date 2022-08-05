@@ -29,6 +29,14 @@ impl<'a> Species<'a> {
         }
     }
 
+    pub fn charge(&self) -> f64 {
+        self.charge
+    }
+
+    pub fn number_density(&self) -> Field<f64> {
+        self.number_density.clone()
+    }
+
     /// Adds a particle.
     pub fn add_particle(&mut self, position: Vec3, velocity: Vec3, macroparticle_weight: f64) {
         self.particles
