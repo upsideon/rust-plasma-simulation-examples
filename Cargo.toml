@@ -9,3 +9,4 @@ edition = "2021"
 
 ndarray = "0.15.6"
 num-traits = "0.2.15"
+rand = "0.8.5"
