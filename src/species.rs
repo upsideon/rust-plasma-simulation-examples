@@ -43,6 +43,18 @@ impl<'a> Species<'a> {
             .push(Particle::new(position, velocity, macroparticle_weight));
     }
 
+    pub fn advance(&mut self, timestep: f64) {
+        let origin = self.mesh.origin();
+        let max_bound = self.mesh.max_bound();
+
+        for particle in &mut self.particles {
+            let logical_coordinate = self.mesh.position_to_logical_coordinate(particle.position);
+            let electric_field = self.mesh.electric_field().gather(logical_coordinate);
+            particle.velocity += electric_field * (timestep * self.charge / self.mass);
+            particle.position += particle.velocity * timestep;
+        }
+    }
+
     pub fn compute_number_density(&mut self) {
         self.number_density.clear();
 
