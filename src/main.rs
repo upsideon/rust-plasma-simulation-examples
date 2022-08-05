@@ -1,6 +1,8 @@
 mod constants;
 mod field;
 mod mesh;
+mod particle;
+mod species;
 mod vector;
 
 mod grounded_box;

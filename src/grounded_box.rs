@@ -1,4 +1,6 @@
+use crate::constants::{ATOMIC_MASS_UNIT, ELECTRON_MASS, ELEMENTARY_CHARGE};
 use crate::mesh::{BoxMesh, Dimensions};
+use crate::species::Species;
 use crate::vector::Vec3;
 
 const MAX_ITERATIONS: usize = 4000;
@@ -19,6 +21,15 @@ pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
 
     grounded_box_mesh.solve_potential(MAX_ITERATIONS, CONVERGENCE_TOLERANCE);
     grounded_box_mesh.compute_electric_field();
+
+    let species = vec![
+        Species::new(
+            String::from("O+"),
+            16.0 * ATOMIC_MASS_UNIT,
+            ELEMENTARY_CHARGE,
+        ),
+        Species::new(String::from("e-"), ELECTRON_MASS, -ELEMENTARY_CHARGE),
+    ];
 
     Ok(())
 }
