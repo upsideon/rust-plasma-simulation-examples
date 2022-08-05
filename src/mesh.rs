@@ -110,10 +110,10 @@ impl BoxMesh {
         logical_coordinate
     }
 
-    pub fn compute_charge_density(&mut self, species: Vec<Species>) {
+    pub fn compute_charge_density(&mut self, species: &Vec<Species>) {
         self.charge_density.clear();
 
-        for s in &species {
+        for s in species {
             if s.charge() == 0.0 {
                 continue;
             }
@@ -202,10 +202,12 @@ impl BoxMesh {
                 if residue_l2_norm < tolerance {
                     converged = true;
 
-                    println!(
+                    // Debugging code.
+
+                    /*println!(
                         "Gauss-Seidel solver converged after {} iterations with an L2 norm of {}.",
                         iteration, residue_l2_norm
-                    );
+                    );*/
 
                     break;
                 }
@@ -213,10 +215,12 @@ impl BoxMesh {
         }
 
         if !converged {
-            println!(
+            // Debugging code.
+
+            /*println!(
                 "Gauss-Seidel solver failed to converge after {} iterations.",
                 max_solver_iterations,
-            );
+            );*/
         }
 
         converged

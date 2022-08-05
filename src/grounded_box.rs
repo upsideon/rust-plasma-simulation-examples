@@ -57,13 +57,25 @@ pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
         NUM_ELECTRONS,
     );
 
-    // Computing number density.
-    for s in &mut species {
-        s.compute_number_density();
-    }
+    // Runing the simulation for 10,000 iterations.
+    for iteration in 0..2 {
+        println!("Iteration: {}", iteration);
 
-    // Computing charge density.
-    grounded_box_mesh.compute_charge_density(species);
+        // Computing charge density.
+        grounded_box_mesh.compute_charge_density(&species);
+
+        // Update potential.
+        grounded_box_mesh.solve_potential(MAX_ITERATIONS, CONVERGENCE_TOLERANCE);
+
+        // Update electric field.
+        grounded_box_mesh.compute_electric_field();
+
+        // Computing number density.
+        for s in &mut species {
+            s.advance();
+            s.compute_number_density();
+        }
+    }
 
     Ok(())
 }
