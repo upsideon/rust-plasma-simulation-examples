@@ -1,4 +1,5 @@
 use std::cmp::PartialEq;
+use std::fmt;
 use std::ops::{Add, AddAssign, Div, Mul, Sub, SubAssign};
 
 use num_traits::identities::Zero;
@@ -19,6 +20,12 @@ impl Vec3 {
 impl PartialEq for Vec3 {
     fn eq(&self, other: &Self) -> bool {
         self.x == other.x && self.y == other.y && self.z == other.z
+    }
+}
+
+impl fmt::Display for Vec3 {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} {} {}", self.x, self.y, self.z)
     }
 }
 

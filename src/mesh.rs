@@ -81,6 +81,9 @@ impl BoxMesh {
     pub fn max_bound(&self) -> Vec3 {
         self.max_bound
     }
+    pub fn cell_spacings(&self) -> [f64; 3] {
+        self.cell_spacings
+    }
 
     pub fn centroid(&self) -> Vec3 {
         self.centroid
@@ -92,6 +95,14 @@ impl BoxMesh {
 
     pub fn node_volumes(&self) -> Field<f64> {
         self.node_volumes.clone()
+    }
+
+    pub fn potential(&self) -> Field<f64> {
+        self.potential.clone()
+    }
+
+    pub fn charge_density(&self) -> Field<f64> {
+        self.charge_density.clone()
     }
 
     pub fn electric_field(&self) -> Field<Vec3> {

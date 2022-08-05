@@ -1,3 +1,4 @@
+use std::fmt;
 use std::ops::{Add, AddAssign, Div, Index, IndexMut, Mul, Sub};
 
 use ndarray::{Array3, ScalarOperand};
@@ -88,6 +89,22 @@ impl<
         self.data[[i + 1, j, k + 1]] += value * (di * (1.0 - dj) * dk);
         self.data[[i + 1, j + 1, k + 1]] += value * (di * dj * dk);
         self.data[[i, j + 1, k + 1]] += value * ((1.0 - di) * dj * dk);
+    }
+}
+
+impl<T: Copy + Clone + Zero + Mul<f64> + AddAssign<<T as Mul<f64>>::Output> + fmt::Display>
+    fmt::Display for Field<T>
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for i in 0..self.shape.0 {
+            for j in 0..self.shape.1 {
+                for k in 0..self.shape.2 {
+                    write!(f, "{} ", self.data[[i, j, k]])?;
+                }
+            }
+        }
+
+        Ok(())
     }
 }
 

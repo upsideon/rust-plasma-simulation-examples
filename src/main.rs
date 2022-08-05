@@ -1,6 +1,7 @@
 mod constants;
 mod field;
 mod mesh;
+mod output;
 mod particle;
 mod species;
 mod vector;

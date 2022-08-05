@@ -1,8 +1,10 @@
 use crate::constants::{ATOMIC_MASS_UNIT, ELECTRON_MASS, ELEMENTARY_CHARGE};
 use crate::mesh::{BoxMesh, Dimensions};
+use crate::output::vtk_output;
 use crate::species::Species;
 use crate::vector::Vec3;
 
+const SIMULATION_ITERATIONS: usize = 2;
 const MAX_ITERATIONS: usize = 4000;
 const CONVERGENCE_TOLERANCE: f64 = 1e-6;
 
@@ -58,7 +60,7 @@ pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
     );
 
     // Runing the simulation for 10,000 iterations.
-    for iteration in 0..2 {
+    for iteration in 0..SIMULATION_ITERATIONS {
         println!("Iteration: {}", iteration);
 
         // Computing charge density.
@@ -74,6 +76,11 @@ pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
         for s in &mut species {
             s.advance(&grounded_box_mesh);
             s.compute_number_density(&grounded_box_mesh);
+        }
+
+        // Outputing simulation state every so often.
+        if iteration % 100 == 0 || iteration == SIMULATION_ITERATIONS {
+            vtk_output(&grounded_box_mesh, &species, iteration)?;
         }
     }
 

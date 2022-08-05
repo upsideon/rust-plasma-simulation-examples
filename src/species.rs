@@ -27,6 +27,10 @@ impl Species {
         }
     }
 
+    pub fn name(&self) -> String {
+        self.name.clone()
+    }
+
     pub fn charge(&self) -> f64 {
         self.charge
     }
