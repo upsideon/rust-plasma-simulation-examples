@@ -12,7 +12,10 @@ pub struct Field<T: Copy + Clone + Zero + Mul<f64> + AddAssign<<T as Mul<f64>>::
     shape: (usize, usize, usize),
 }
 
-impl<T: Copy + Clone + Zero + Mul<f64> + AddAssign<<T as Mul<f64>>::Output>> Field<T> {
+impl<
+        T: Copy + Clone + Zero + Mul<f64> + AddAssign<<T as Mul<f64>>::Output> + Mul<f64, Output = T>,
+    > Field<T>
+{
     pub fn new(dimensions: Dimensions) -> Self {
         let shape: (usize, usize, usize) = dimensions.into();
         let data = Array3::<T>::zeros(shape);
@@ -31,6 +34,29 @@ impl<T: Copy + Clone + Zero + Mul<f64> + AddAssign<<T as Mul<f64>>::Output>> Fie
                 }
             }
         }
+    }
+
+    pub fn gather(&self, logical_coordinate: Vec3) -> T {
+        let lc = logical_coordinate;
+
+        let i = lc.x as usize;
+        let j = lc.y as usize;
+        let k = lc.z as usize;
+
+        let di = lc.x - i as f64;
+        let dj = lc.y - j as f64;
+        let dk = lc.z - k as f64;
+
+        let value: T = self.data[[i, j, k]] * ((1.0 - di) * (1.0 - dj) * (1.0 - dk))
+            + self.data[[i + 1, j, k]] * (di * (1.0 - dj) * (1.0 - dk))
+            + self.data[[i + 1, j + 1, k]] * (di * dj * (1.0 - dk))
+            + self.data[[i, j + 1, k]] * ((1.0 - di) * dj * (1.0 - dk))
+            + self.data[[i, j, k + 1]] * ((1.0 - di) * (1.0 - dj) * dk)
+            + self.data[[i + 1, j, k + 1]] * (di * (1.0 - dj) * dk)
+            + self.data[[i + 1, j + 1, k + 1]] * (di * dj * dk)
+            + self.data[[i, j + 1, k + 1]] * ((1.0 - di) * dj * dk);
+
+        value
     }
 
     pub fn scatter(&mut self, logical_coordinate: Vec3, value: T) {
