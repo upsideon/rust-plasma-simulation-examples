@@ -47,6 +47,12 @@ The simulation can be run using Cargo, as follows:
 cargo run --release -- single-particle
 ```
 
+A trace of the electron and the potential/kinetic energy of the system is written to `trace.csv`.
+
+Below is a plot which shows the electron's position over time:
+
+![Plot of Electron Oscillating](plots/electron-oscillating.png)
+
 #### Chapter 2 - Multiple Particles in Grounded Box
 
 Many electrons and oxygen ions are distributed within a three dimensional box that has reflective sides. The electron cloud starts in one octant of the box and oscillates back and forth in an attempt to reach equilibrium. This is an electrostatic environment, so no magnetic field calculations are involved.
@@ -62,6 +68,12 @@ The simulation can be run using Cargo, as follows:
 ```
 cargo run --release -- grounded-box
 ```
+
+The simulation periodically outputs files containing data on the electron/ion density, electric field, potential, and charge density at different times. Upon creation, the files are stored in the `results` directory. These files are written in the VTI format, which allows our simulation to be viewed via a visualization tool called Paraview.
+
+Below is an animation of the simulation running in Paraview:
+
+![Animation of Grounded Box Plasma](animations/grounded-box-animation.gif)
 
 ### Testing
 
