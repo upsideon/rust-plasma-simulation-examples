@@ -4,9 +4,9 @@ use crate::output::vtk_output;
 use crate::species::Species;
 use crate::vector::Vec3;
 
-const SIMULATION_ITERATIONS: usize = 200;
+const SIMULATION_ITERATIONS: usize = 10000;
 const MAX_ITERATIONS: usize = 4000;
-const CONVERGENCE_TOLERANCE: f64 = 1e-4;
+const CONVERGENCE_TOLERANCE: f64 = 1e-6;
 
 pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
     // Note that the mesh dimensions must be high enough, relative to the distance

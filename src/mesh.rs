@@ -97,16 +97,16 @@ impl BoxMesh {
         self.node_volumes.clone()
     }
 
-    pub fn potential(&self) -> Field<f64> {
-        self.potential.clone()
+    pub fn potential(&self) -> &Field<f64> {
+        &self.potential
     }
 
-    pub fn charge_density(&self) -> Field<f64> {
-        self.charge_density.clone()
+    pub fn charge_density(&self) -> &Field<f64> {
+        &self.charge_density
     }
 
-    pub fn electric_field(&self) -> Field<Vec3> {
-        self.electric_field.clone()
+    pub fn electric_field(&self) -> &Field<Vec3> {
+        &self.electric_field
     }
 
     pub fn timestep(&self) -> f64 {
@@ -213,25 +213,9 @@ impl BoxMesh {
                 if residue_l2_norm < tolerance {
                     converged = true;
 
-                    // Debugging code.
-
-                    /*println!(
-                        "Gauss-Seidel solver converged after {} iterations with an L2 norm of {}.",
-                        iteration, residue_l2_norm
-                    );*/
-
                     break;
                 }
             }
-        }
-
-        if !converged {
-            // Debugging code.
-
-            /*println!(
-                "Gauss-Seidel solver failed to converge after {} iterations.",
-                max_solver_iterations,
-            );*/
         }
 
         converged
