@@ -15,4 +15,5 @@ COPY . .
 
 RUN cargo install --path .
 
-CMD ["plasma-simulation"]
+ENTRYPOINT ["plasma-simulation"]
+CMD ["bash"]
