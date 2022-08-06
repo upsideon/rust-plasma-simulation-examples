@@ -37,6 +37,10 @@ Python is used for generating any plots associated with the simulations. The dep
 pip install -r requirements.txt
 ```
 
+#### ParaView
+
+[ParaView](https://www.paraview.org/) is an open-source, multi-platform data analysis and visualization application. The book uses it for visualization the original C++ simulations, so we continue this practice here. Besides being used in the book, ParaView stands on its own as a useful visualization tool. Download instructions are provided [here](https://www.paraview.org/download/).
+
 ### Simulations
 
 Those simulations which have been implemented so far are listed below, with instructions for how to execute them and examples of the resulting artifacts.
@@ -83,9 +87,11 @@ cargo run --release -- grounded-box
 
 The simulation periodically outputs files containing data on the electron/ion density, electric field, potential, and charge density at different times. Upon creation, the files are stored in the `results` directory. These files are written in the VTI format, which allows our simulation to be viewed via a visualization tool called Paraview.
 
-Below is an animation of the simulation running in Paraview:
+Below is an animation of the simulation running in ParaView:
 
 ![Animation of Grounded Box Plasma](animations/grounded-box-animation.gif)
+
+The animation displays electron density over time.
 
 ### Testing
 
