@@ -112,7 +112,7 @@ impl Species {
     }
 
     /// Loads particles in a box defined by points in opposite corners of the box.
-    pub fn load_particles_box(
+    pub fn _load_particles_box(
         &mut self,
         origin: Vec3,
         opposite: Vec3,
@@ -137,7 +137,7 @@ impl Species {
         }
     }
 
-    /// Loads particles using the quite start method.
+    /// Loads particles in a box using the quite start method.
     pub fn load_particles_box_qs(
         &mut self,
         origin: Vec3,

@@ -41,8 +41,6 @@ pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
     ];
 
     const NUMBER_DENSITY: f64 = 1e11;
-    const NUM_IONS: usize = 80000;
-    const NUM_ELECTRONS: usize = 10000;
 
     species[0].load_particles_box_qs(
         grounded_box_mesh.origin(),
