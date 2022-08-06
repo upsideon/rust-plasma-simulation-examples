@@ -10,21 +10,57 @@ The author of the book provides simulation code written in C++, but here the sim
 
 ![Cover of Plasma Simulations by Example](https://images-na.ssl-images-amazon.com/images/I/41sqjn4babL._SY291_BO1,204,203,200_QL40_ML2_.jpg)
 
-### Execution
+### Building and Installation
 
-The plasma simulations can be run with the following Docker commands:
+The code can be built and installed in a Docker container by running the following command:
 
 ```
 docker build -t plasma .
-docker run -it --rm -v $(pwd):/usr/src/plasma-simulation --name plasma plasma
 ```
 
-Or by executing the `run.sh` script, if you are in a Unix based environment.
-
-If Rust is installed on your machine, simply run the following command:
+Outside of Docker, the code can be built and installed via the standard Cargo methodology:
 
 ```
-cargo run
+cargo build --release
+cargo install --path .
+```
+
+Note that installation is not necessary if you simply wish to run the executable, following the build, from the `target` directory within the directory containing the cloned repository.
+
+### Simulations
+
+Those simulations which have been implemented so far are listed below, with instructions for how to execute them and examples of the resulting artifacts.
+
+#### Chapter 1 - Single Particle in 1-D Space
+
+A single electron trapped in a one dimensional potential well. The electron oscillates back and forth within the well, in a quest to balance the positive charge with the regions where it doesn't currently reside.
+
+The simulation can be run via Docker, as follows:
+
+```
+docker run -it --rm -v $(pwd):/usr/src/plasma-simulation --name plasma plasma single-particle
+```
+
+The simulation can be run using Cargo, as follows:
+
+```
+cargo run --release -- single-particle
+```
+
+#### Chapter 2 - Multiple Particles in Grounded Box
+
+Many electrons and oxygen ions are distributed within a three dimensional box that has reflective sides. The electron cloud starts in one octant of the box and oscillates back and forth in an attempt to reach equilibrium. This is an electrostatic environment, so no magnetic field calculations are involved.
+
+The simulation can be run via Docker, as follows:
+
+```
+docker run -it --rm -v $(pwd):/usr/src/plasma-simulation --name plasma plasma grounded-box
+```
+
+The simulation can be run using Cargo, as follows:
+
+```
+cargo run --release -- grounded-box
 ```
 
 ### Testing
@@ -32,7 +68,7 @@ cargo run
 Tests can be run via Docker using the following command:
 
 ```
-docker run -it --rm -v $(pwd):/usr/src/plasma-simulation --name plasma plasma cargo test
+docker run --entrypoint=/bin/sh plasma -c "cargo test"
 ```
 
 Tests can be run outside of Docker as follows:
