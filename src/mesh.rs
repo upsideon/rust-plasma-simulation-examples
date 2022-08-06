@@ -236,7 +236,6 @@ impl BoxMesh {
                 residue_l2_norm = (sum / volume).sqrt();
                 if residue_l2_norm < tolerance {
                     converged = true;
-
                     break;
                 }
             }

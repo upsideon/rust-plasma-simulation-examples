@@ -6,12 +6,14 @@ mod particle;
 mod species;
 mod vector;
 
-mod grounded_box;
-mod single_particle;
+mod simulations;
 
 use std::env;
 use std::io::{Error, ErrorKind};
 use std::time::Instant;
+
+use crate::simulations::grounded_box;
+use crate::simulations::single_particle;
 
 fn main() -> std::io::Result<()> {
     const NUM_MESH_NODES: usize = 21;
