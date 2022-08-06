@@ -171,6 +171,9 @@ impl BoxMesh {
         let mut residue_l2_norm;
         let mut converged = false;
 
+        let gauss_seidel_denominator = 2.0 * dx2 + 2.0 * dy2 + 2.0 * dz2;
+        let volume = (dimensions.x * dimensions.y * dimensions.z) as f64;
+
         // Iterating through mesh to solve potential.
         for iteration in 0..max_solver_iterations {
             for i in 1..dimensions.x - 1 {
@@ -181,7 +184,7 @@ impl BoxMesh {
                             + dx2 * (phi[[i - 1, j, k]] + phi[[i + 1, j, k]])
                             + dy2 * (phi[[i, j - 1, k]] + phi[[i, j + 1, k]])
                             + dz2 * (phi[[i, j, k - 1]] + phi[[i, j, k + 1]]))
-                            / (2.0 * dx2 + 2.0 * dy2 + 2.0 * dz2);
+                            / gauss_seidel_denominator;
 
                         let current_phi = phi[[i, j, k]];
 
@@ -198,7 +201,7 @@ impl BoxMesh {
                 for i in 1..dimensions.x - 1 {
                     for j in 1..dimensions.y - 1 {
                         for k in 1..dimensions.z - 1 {
-                            let r = -phi[[i, j, k]] * (2.0 * dx2 + 2.0 * dy2 + 2.0 * dz2)
+                            let r = -phi[[i, j, k]] * gauss_seidel_denominator
                                 + (rho[[i, j, k]] / PERMITTIVITY)
                                 + dx2 * (phi[[i - 1, j, k]] + phi[[i + 1, j, k]])
                                 + dy2 * (phi[[i, j - 1, k]] + phi[[i, j + 1, k]])
@@ -208,8 +211,7 @@ impl BoxMesh {
                     }
                 }
 
-                residue_l2_norm =
-                    (sum / (dimensions.x * dimensions.y * dimensions.z) as f64).sqrt();
+                residue_l2_norm = (sum / volume).sqrt();
                 if residue_l2_norm < tolerance {
                     converged = true;
 
