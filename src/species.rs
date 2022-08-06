@@ -8,15 +8,22 @@ use crate::mesh::{BoxMesh, Dimensions};
 use crate::particle::Particle;
 use crate::vector::Vec3;
 
+/// Represents a species of particle.
 pub struct Species {
+    /// The name of the species.
     name: String,
+    /// The mass of the particles in the species.
     mass: f64,
+    /// The charge of the particles in the species.
     charge: f64,
+    /// The number density of the species.
     number_density: Field<f64>,
+    /// The particles within the species.
     particles: Vec<Particle>,
 }
 
 impl Species {
+    /// Creates a new instance of Species.
     pub fn new(name: String, mass: f64, charge: f64, mesh_dimensions: Dimensions) -> Self {
         Species {
             name: name,
@@ -27,14 +34,17 @@ impl Species {
         }
     }
 
+    /// Returns the name of the species.
     pub fn name(&self) -> String {
         self.name.clone()
     }
 
+    /// Returns the charge of the particles in the species.
     pub fn charge(&self) -> f64 {
         self.charge
     }
 
+    /// Returns the number density of the species.
     pub fn number_density(&self) -> Field<f64> {
         self.number_density.clone()
     }
@@ -60,6 +70,7 @@ impl Species {
         ));
     }
 
+    /// Adjusts particle positions and velocities.
     pub fn advance(&mut self, mesh: &BoxMesh) {
         let origin = mesh.origin();
         let max_bound = mesh.max_bound();
@@ -99,6 +110,7 @@ impl Species {
         }
     }
 
+    /// Computes the number density of the species based on the simulation mesh.
     pub fn compute_number_density(&mut self, mesh: &BoxMesh) {
         self.number_density.clear();
 

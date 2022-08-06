@@ -4,12 +4,22 @@ use std::io::Write;
 
 use crate::constants::{ELECTRON_MASS, ELEMENTARY_CHARGE, PERMITTIVITY};
 
+/// Maximum number of iterations for the potential solver.
 const MAX_ITERATIONS: usize = 4000;
+
+/// The number of iterations that the potential solver will wait before checking for convergence again.
 const CONVERGENCE_CHECK_RATE: usize = 50;
+
+/// The threshold of L2 norm residue by which potential convergence is defined.
 const CONVERGENCE_TOLERANCE: f64 = 1e-6;
+
+/// The change in simulation time per iteration.
 const SIMULATION_TIMESTEP: f64 = 1e-10;
+
+/// The number of timesteps executed by the simulation.
 const NUM_SIMULATION_TIMESTEPS: usize = 5000;
 
+/// Simulates a single electron oscillating in a 1-dimensional potential well.
 pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
     let mut potential = vec![0.0_f64; num_mesh_nodes];
     let mut charge_density = vec![ELEMENTARY_CHARGE * 1e12; num_mesh_nodes];
@@ -111,6 +121,7 @@ pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
     Ok(())
 }
 
+/// Solves the potential field.
 fn solve_potential(potential: &mut Vec<f64>, charge_density: &mut Vec<f64>, dx: f64) {
     let dx2 = dx * dx;
     let relaxation_parameter: f64 = 1.4;
@@ -160,6 +171,7 @@ fn solve_potential(potential: &mut Vec<f64>, charge_density: &mut Vec<f64>, dx: 
     );
 }
 
+/// Computes the electric field.
 fn compute_electric_field(
     potential: &mut Vec<f64>,
     electric_field: &mut Vec<f64>,
@@ -187,10 +199,12 @@ fn compute_electric_field(
     }
 }
 
+/// Converts a position to a logical coordinate.
 fn position_to_logical_coordinate(position: f64, dx: f64, mesh_origin: f64) -> f64 {
     return (position - mesh_origin) / dx;
 }
 
+/// Interpolates field values at points between mesh nodes.
 fn gather(logical_coordinate: f64, field: &mut Vec<f64>) -> f64 {
     let left_node_index = logical_coordinate.trunc() as usize;
     let right_node_index = left_node_index + 1;
@@ -200,6 +214,7 @@ fn gather(logical_coordinate: f64, field: &mut Vec<f64>) -> f64 {
         + field[right_node_index] * fractional_distance;
 }
 
+/// Outputs the simulation state.
 fn _output_simulation_state(
     potential: &mut Vec<f64>,
     charge_density: &mut Vec<f64>,

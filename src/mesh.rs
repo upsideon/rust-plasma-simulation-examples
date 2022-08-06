@@ -3,14 +3,19 @@ use crate::field::Field;
 use crate::species::Species;
 use crate::vector::Vec3;
 
+/// Represents the dimensions of a simulation mesh.
 #[derive(Clone, Copy, Debug)]
 pub struct Dimensions {
+    /// The x-dimension of the mesh.
     pub x: usize,
+    /// The y-dimension of the mesh.
     pub y: usize,
+    /// The z-dimension of the mesh.
     pub z: usize,
 }
 
 impl Dimensions {
+    /// Creates a new set of dimensions.
     pub fn new(x: usize, y: usize, z: usize) -> Self {
         Dimensions { x: x, y: y, z: z }
     }
@@ -22,6 +27,7 @@ impl From<Dimensions> for (usize, usize, usize) {
     }
 }
 
+/// Represents a simulation box mesh.
 #[derive(Clone, Debug)]
 pub struct BoxMesh {
     /// Specifies coordinates of the origin in 3-dimensional space.
@@ -47,6 +53,7 @@ pub struct BoxMesh {
 }
 
 impl BoxMesh {
+    /// Creates a box mesh.
     pub fn new(origin: Vec3, max_bound: Vec3, dimensions: Dimensions, timestep: f64) -> Self {
         let centroid = (origin + max_bound) * 0.5;
 
@@ -74,45 +81,57 @@ impl BoxMesh {
         mesh
     }
 
+    /// Returns the origin of the box.
     pub fn origin(&self) -> Vec3 {
         self.origin
     }
 
+    /// Returns the corner of the box furthest from the origin.
     pub fn max_bound(&self) -> Vec3 {
         self.max_bound
     }
+
+    /// Returns the spacings between mesh nodes in each dimension.
     pub fn cell_spacings(&self) -> [f64; 3] {
         self.cell_spacings
     }
 
+    /// Returns the centroid of the box.
     pub fn centroid(&self) -> Vec3 {
         self.centroid
     }
 
+    /// Returns the dimensions of the box.
     pub fn dimensions(&self) -> Dimensions {
         self.dimensions
     }
 
+    /// Returns node volumes.
     pub fn node_volumes(&self) -> Field<f64> {
         self.node_volumes.clone()
     }
 
+    /// Returns the potential field on the mesh.
     pub fn potential(&self) -> &Field<f64> {
         &self.potential
     }
 
+    /// Returns the charge density on the mesh.
     pub fn charge_density(&self) -> &Field<f64> {
         &self.charge_density
     }
 
+    /// Returns the electric field on the mesh.
     pub fn electric_field(&self) -> &Field<Vec3> {
         &self.electric_field
     }
 
+    /// Returns the change in time for a mesh iteration.
     pub fn timestep(&self) -> f64 {
         self.timestep
     }
 
+    /// Converts a position to a logical coordinate.
     pub fn position_to_logical_coordinate(&self, position: Vec3) -> Vec3 {
         let mut logical_coordinate = position - self.origin;
         logical_coordinate.x /= self.cell_spacings[0] as f64;
@@ -121,6 +140,7 @@ impl BoxMesh {
         logical_coordinate
     }
 
+    /// Computes charge density on the mesh.
     pub fn compute_charge_density(&mut self, species: &Vec<Species>) {
         self.charge_density.clear();
 
@@ -133,6 +153,7 @@ impl BoxMesh {
         }
     }
 
+    /// Computes node volumes.
     pub fn compute_node_volumes(&mut self) {
         let cell_spacings = self.cell_spacings;
         let dimensions = self.dimensions;
@@ -159,6 +180,7 @@ impl BoxMesh {
         }
     }
 
+    /// Solves the potential field.
     pub fn solve_potential(&mut self, max_solver_iterations: usize, tolerance: f64) -> bool {
         let dx2 = 1.0 / (self.cell_spacings[0] * self.cell_spacings[0]);
         let dy2 = 1.0 / (self.cell_spacings[1] * self.cell_spacings[1]);
@@ -223,6 +245,7 @@ impl BoxMesh {
         converged
     }
 
+    /// Computes the electric field.
     pub fn compute_electric_field(&mut self) {
         let dx = self.cell_spacings[0];
         let dy = self.cell_spacings[1];

@@ -6,6 +6,7 @@ use std::path::Path;
 use crate::mesh::BoxMesh;
 use crate::species::Species;
 
+/// Outputs the current state of the simulation to a VTI file.
 pub fn vtk_output(mesh: &BoxMesh, species: &Vec<Species>, file_index: usize) -> Result<()> {
     // Creating the results directory, if it doesn't exist.
     fs::create_dir_all("results")?;

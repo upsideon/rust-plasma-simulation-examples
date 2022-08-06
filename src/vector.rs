@@ -4,14 +4,19 @@ use std::ops::{Add, AddAssign, Div, Mul, Sub, SubAssign};
 
 use num_traits::identities::Zero;
 
+/// Represents a 3-dimensional vector.
 #[derive(Clone, Copy, Debug)]
 pub struct Vec3 {
+    /// The x-component of the vector.
     pub x: f64,
+    /// The y-component of the vector.
     pub y: f64,
+    /// The z-component of the vector.
     pub z: f64,
 }
 
 impl Vec3 {
+    /// Creates a new 3-dimensional vector.
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Vec3 { x: x, y: y, z: z }
     }

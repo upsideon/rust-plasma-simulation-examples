@@ -7,6 +7,7 @@ use num_traits::identities::Zero;
 use crate::mesh::Dimensions;
 use crate::vector::Vec3;
 
+/// Represents a field.
 #[derive(Clone, Debug)]
 pub struct Field<T: Copy + Clone + Zero + Mul<f64> + AddAssign<<T as Mul<f64>>::Output>> {
     data: Array3<T>,
@@ -17,6 +18,7 @@ impl<
         T: Copy + Clone + Zero + Mul<f64> + AddAssign<<T as Mul<f64>>::Output> + Mul<f64, Output = T>,
     > Field<T>
 {
+    /// Creates a new field with the provided dimensions.
     pub fn new(dimensions: Dimensions) -> Self {
         let shape: (usize, usize, usize) = dimensions.into();
         let data = Array3::<T>::zeros(shape);
@@ -27,6 +29,7 @@ impl<
         }
     }
 
+    /// Clears the field to its zero value.
     pub fn clear(&mut self) {
         for i in 0..self.shape.0 {
             for j in 0..self.shape.1 {
@@ -37,6 +40,7 @@ impl<
         }
     }
 
+    /// Interpolates field values at points between mesh nodes.
     pub fn gather(&self, logical_coordinate: Vec3) -> T {
         let lc = logical_coordinate;
 
@@ -70,6 +74,7 @@ impl<
         value
     }
 
+    /// Disperses a value at a point to the surrounding mesh nodes.
     pub fn scatter(&mut self, logical_coordinate: Vec3, value: T) {
         let lc = logical_coordinate;
 
