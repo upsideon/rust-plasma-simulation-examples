@@ -4,9 +4,9 @@ use crate::output::vtk_output;
 use crate::species::Species;
 use crate::vector::Vec3;
 
-const SIMULATION_ITERATIONS: usize = 2;
+const SIMULATION_ITERATIONS: usize = 200;
 const MAX_ITERATIONS: usize = 4000;
-const CONVERGENCE_TOLERANCE: f64 = 1e-6;
+const CONVERGENCE_TOLERANCE: f64 = 1e-4;
 
 pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
     // Note that the mesh dimensions must be high enough, relative to the distance
@@ -44,18 +44,18 @@ pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
     const NUM_IONS: usize = 80000;
     const NUM_ELECTRONS: usize = 10000;
 
-    species[0].load_particles_box(
+    species[0].load_particles_box_qs(
         grounded_box_mesh.origin(),
         grounded_box_mesh.max_bound(),
         NUMBER_DENSITY,
-        NUM_IONS,
+        (41, 41, 41),
         &grounded_box_mesh,
     );
-    species[1].load_particles_box(
+    species[1].load_particles_box_qs(
         grounded_box_mesh.origin(),
         grounded_box_mesh.centroid(),
         NUMBER_DENSITY,
-        NUM_ELECTRONS,
+        (21, 21, 21),
         &grounded_box_mesh,
     );
 
@@ -79,7 +79,7 @@ pub fn simulate(num_mesh_nodes: usize) -> std::io::Result<()> {
         }
 
         // Outputing simulation state every so often.
-        if iteration % 100 == 0 || iteration == SIMULATION_ITERATIONS {
+        if iteration == 0 || iteration % 100 == 0 || iteration == SIMULATION_ITERATIONS {
             vtk_output(&grounded_box_mesh, &species, iteration)?;
         }
     }

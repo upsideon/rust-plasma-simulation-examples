@@ -115,9 +115,9 @@ impl BoxMesh {
 
     pub fn position_to_logical_coordinate(&self, position: Vec3) -> Vec3 {
         let mut logical_coordinate = position - self.origin;
-        logical_coordinate.x /= self.dimensions.x as f64;
-        logical_coordinate.y /= self.dimensions.y as f64;
-        logical_coordinate.z /= self.dimensions.z as f64;
+        logical_coordinate.x /= self.cell_spacings[0] as f64;
+        logical_coordinate.y /= self.cell_spacings[1] as f64;
+        logical_coordinate.z /= self.cell_spacings[2] as f64;
         logical_coordinate
     }
 

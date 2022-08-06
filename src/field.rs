@@ -40,6 +40,16 @@ impl<
     pub fn gather(&self, logical_coordinate: Vec3) -> T {
         let lc = logical_coordinate;
 
+        if lc.x < 0.0
+            || lc.x >= (self.shape.0 - 1) as f64
+            || lc.y < 0.0
+            || lc.y >= (self.shape.1 - 1) as f64
+            || lc.z < 0.0
+            || lc.z >= (self.shape.2 - 1) as f64
+        {
+            return T::zero();
+        }
+
         let i = lc.x as usize;
         let j = lc.y as usize;
         let k = lc.z as usize;

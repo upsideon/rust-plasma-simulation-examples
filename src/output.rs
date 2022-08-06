@@ -2,15 +2,23 @@ use std::fs;
 use std::fs::File;
 use std::io::{Result, Write};
 use std::path::Path;
+use std::string::String;
 
 use crate::mesh::BoxMesh;
 use crate::species::Species;
+
+pub fn diagnostic(mesh: &BoxMesh, species: &Vec<Species>, iteration: usize) {
+    let filepath = String::from("runtime_diags.csv");
+    let path = Path::new(&filepath);
+
+    let mut diagnostic_file = File::create(path).unwrap();
+}
 
 pub fn vtk_output(mesh: &BoxMesh, species: &Vec<Species>, file_index: usize) -> Result<()> {
     // Creating the results directory, if it doesn't exist.
     fs::create_dir_all("results")?;
 
-    let filepath = format!("results/field_{}.vti", file_index);
+    let filepath = format!("results/field_{:05}.vti", file_index);
     let path = Path::new(&filepath);
 
     let mut vti_file = File::create(path).unwrap();
