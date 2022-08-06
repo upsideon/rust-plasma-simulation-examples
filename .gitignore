@@ -1,2 +1,4 @@
 /target
 *.csv
+results
+*.profile
