@@ -1,12 +1,12 @@
 ## Rust Plasma Simulation Examples
 
-This repository contains a set of basic plasma physics simulations implemented based on Lubos Brieda's *Plasma Simulations by Example*.
+This repository contains a set of basic plasma physics simulations implemented based on Lubos Brieda's _Plasma Simulations by Example_.
 
 The author of the book [provides simulation code](https://github.com/particleincell/plasma-simulations-by-example) written in C++, but here the simulations have been re-implemented in Rust. I undertook this project to challenge myself and to better internalize the computational physics concepts outlined in the book.
 
 ### Book
 
-*Plasma Simulations by Example* by Lubos Brieda can be found [here](https://www.amazon.com/gp/product/1138342327). As a disclaimer, I am not associated with the author and I have not been paid to promote this book. I find the text to be a useful resource for understanding the basics of computational plasma physics. The author is duly credited, as this repository represents a fair use derivative work of the author's original C++ simulation code.
+_Plasma Simulations by Example_ by Lubos Brieda can be found [here](https://www.amazon.com/gp/product/1138342327). As a disclaimer, I am not associated with the author and I have not been paid to promote this book. I find the text to be a useful resource for understanding the basics of computational plasma physics. The author is duly credited, as this repository represents a fair use derivative work of the author's original C++ simulation code.
 
 ![Cover of Plasma Simulations by Example](https://images-na.ssl-images-amazon.com/images/I/41sqjn4babL._SY291_BO1,204,203,200_QL40_ML2_.jpg)
 
@@ -92,6 +92,14 @@ Below is an animation of the simulation running in ParaView:
 ![Animation of Grounded Box Plasma](animations/grounded-box-animation.gif)
 
 The animation displays electron density over time.
+
+To view the animation within Paraview, carry out the following steps:
+
+- Open Paraview and click on `File > Open`.
+- Select and open the VTI files in the `results` directory as a group.
+- In the `Pipeline Browser` section, click on the eye icon next to `field_00000.vti` to view the file group.
+- Change the dropdown values in the top menu to `e-` and `Volume` respectively.
+- Press the play button the start the animation.
 
 ### Testing
 
