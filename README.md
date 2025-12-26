@@ -2,7 +2,7 @@
 
 This repository contains a set of basic plasma physics simulations implemented based on Lubos Brieda's *Plasma Simulations by Example*.
 
-The author of the book provides simulation code written in C++, but here the simulations have been re-implemented in Rust. I undertook this project to challenge myself and to better internalize the computational physics concepts outlined in the book.
+The author of the book [provides simulation code](https://github.com/particleincell/plasma-simulations-by-example) written in C++, but here the simulations have been re-implemented in Rust. I undertook this project to challenge myself and to better internalize the computational physics concepts outlined in the book.
 
 ### Book
 
